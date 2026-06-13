@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input[type="email"], input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="email"]:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result.valid {
+            background-color: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            color: #1b5e20;
+        }
+
+        .result.risky {
+            background-color: #fff3e0;
+            border-left: 4px solid #ff9800;
+            color: #e65100;
+        }
+
+        .result.invalid {
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+            color: #c62828;
+        }
+
+        .result-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .result-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .result-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .result-icon {
+            font-size: 20px;
+            margin-right: 10px;
+            min-width: 20px;
+        }
+
+        .result-reason {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            font-style: italic;
+        }
+
+        .error {
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .history {
+            margin-top: 40px;
+            border-top: 2px solid #e0e0e0;
+            padding-top: 30px;
+        }
+
+        .history h2 {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .history-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .history-item {
+            padding: 12px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .history-email {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .history-status {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .history-status.valid {
+            background: #e8f5e9;
+            color: #1b5e20;
+        }
+
+        .history-status.risky {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .history-status.invalid {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .no-history {
+            color: #999;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📧 Email Verification Tool</h1>
+        <p class="subtitle">Check if an email address is valid, risky, or disposable</p>
+
+        <form id="verifyForm">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    placeholder="john@example.com" 
+                    required
+                >
+            </div>
+            <button type="submit">Verify Email</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Verifying email...</p>
+        </div>
+
+        <div class="error" id="error"></div>
+
+        <div class="result" id="result"></div>
+
+        <div class="history" id="history">
+            <h2>Recent Verifications</h2>
+            <div class="history-list" id="historyList"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+
+        // Form submission
+        document.getElementById('verifyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            
+            if (!email) {
+                showError('Please enter an email address');
+                return;
+            }
+
+            await verifyEmail(email);
+        });
+
+        async function verifyEmail(email) {
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const result = document.getElementById('result');
+
+            // Show loading, hide others
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            result.style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_URL}/api/verify`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email }),
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.detail || 'Verification failed');
+                }
+
+                const data = await response.json();
+                loading.style.display = 'none';
+                displayResult(data);
+                loadHistory();
+
+            } catch (err) {
+                loading.style.display = 'none';
+                showError(err.message);
+            }
+        }
+
+        function displayResult(data) {
+            const result = document.getElementById('result');
+            const statusClass = data.status.toLowerCase();
+
+            const statusEmoji = {
+                'valid': '✅',
+                'risky': '⚠️',
+                'invalid': '❌'
+            }[data.status] || '❓';
+
+            result.className = `result ${statusClass}`;
+            result.innerHTML = `
+                <div class="result-title">${statusEmoji} ${data.status.toUpperCase()}</div>
+                <div class="result-details">
+                    <div class="result-item">
+                        <span class="result-icon">${data.is_valid_format ? '✓' : '✗'}</span>
+                        <span>Valid Format: ${data.is_valid_format ? 'Yes' : 'No'}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-icon">${data.domain_exists ? '✓' : '✗'}</span>
+                        <span>Domain Exists: ${data.domain_exists ? 'Yes' : 'No'}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-icon">${data.mx_found ? '✓' : '✗'}</span>
+                        <span>MX Records: ${data.mx_found ? 'Found' : 'Not Found'}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-icon">${!data.is_disposable ? '✓' : '✗'}</span>
+                        <span>Disposable: ${data.is_disposable ? 'Yes' : 'No'}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-icon">${!data.is_role_based ? '✓' : '✗'}</span>
+                        <span>Role-Based: ${data.is_role_based ? 'Yes' : 'No'}</span>
+                    </div>
+                </div>
+                <div class="result-reason">📝 ${data.reason}</div>
+            `;
+            result.style.display = 'block';
+        }
+
+        async function loadHistory() {
+            try {
+                const response = await fetch(`${API_URL}/api/history?limit=5`);
+                const data = await response.json();
+
+                const historyList = document.getElementById('historyList');
+                
+                if (data.records.length === 0) {
+                    historyList.innerHTML = '<div class="no-history">No verification history yet</div>';
+                    return;
+                }
+
+                historyList.innerHTML = data.records.map(record => `
+                    <div class="history-item">
+                        <div>
+                            <div class="history-email">${record.email}</div>
+                            <div style="color: #999; font-size: 12px;">${record.reason}</div>
+                        </div>
+                        <span class="history-status ${record.status}">${record.status}</span>
+                    </div>
+                `).join('');
+
+            } catch (err) {
+                console.error('Failed to load history:', err);
+            }
+        }
+
+        function showError(message) {
+            const error = document.getElementById('error');
+            error.textContent = `❌ ${message}`;
+            error.style.display = 'block';
+        }
+
+        // Load history on page load
+        loadHistory();
+    </script>
+</body>
+</html>
