@@ -5,7 +5,6 @@ from typing import Dict, Tuple
 
 # Disposable email domains list (expanded for demo)
 DISPOSABLE_DOMAINS = {
-    "gmail.com", "yahoo.com", "hotmail.com", "outlook.com",  # Free emails
     "tempmail.com", "guerrillamail.com", "mailinator.com",  # Temp emails
     "10minutemail.com", "throwaway.email", "trashmail.com",
     "yopmail.com", "maildrop.io", "temp-mail.org",
