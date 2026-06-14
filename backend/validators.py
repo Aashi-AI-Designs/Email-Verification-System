@@ -21,12 +21,7 @@ ROLE_BASED_PREFIXES = {
 def validate_email_format(email: str) -> Tuple[bool, str]:
     """
     Validate email format using regex.
-    
-    Interview concept: RFC 5322 vs practical regex
-    - RFC 5322 is complex and allows weird emails
-    - In practice, use simpler regex that catches 95% of cases
-    - Trade-off: simplicity vs completeness
-    
+
     Returns: (is_valid, reason)
     """
     # Simple but effective regex
