@@ -57,12 +57,6 @@ def extract_domain(email: str) -> str:
 async def check_mx_records(domain: str) -> Tuple[bool, bool, str]:
     """
     Check if domain exists and has MX records.
-    
-    Interview concept: Async I/O
-    - DNS lookups are network I/O (slow)
-    - async/await allows handling multiple requests concurrently
-    - Why this matters: scalability
-    
     Returns: (domain_exists, mx_found, reason)
     """
     try:
@@ -85,12 +79,6 @@ async def check_mx_records(domain: str) -> Tuple[bool, bool, str]:
 def is_disposable_domain(domain: str) -> Tuple[bool, str]:
     """
     Check if domain is a disposable/temporary email provider.
-    
-    Interview concept: Data structures & lookups
-    - Set lookup: O(1) average case
-    - vs List lookup: O(n)
-    - Why: performance at scale
-    
     In production, you'd fetch this from an API or database
     """
     domain = domain.lower()
@@ -132,12 +120,6 @@ def determine_status(
 ) -> Tuple[str, str]:
     """
     Determine final verification status based on all checks.
-    
-    Interview concept: Business logic & decision trees
-    - What makes an email "valid" vs "risky" vs "invalid"?
-    - This is where you implement business rules
-    - Communicate assumptions clearly
-    
     Returns: (status, reason)
     """
     
@@ -165,11 +147,6 @@ def determine_status(
 async def verify_email(email: str) -> Dict:
     """
     Complete email verification workflow.
-    
-    Interview concept: Function composition
-    - Break complex logic into smaller functions
-    - Each function has one responsibility
-    - Easy to test, debug, and explain
     """
     email = email.strip().lower()
     
