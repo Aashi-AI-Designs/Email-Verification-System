@@ -29,8 +29,6 @@ def validate_email_format(email: str) -> Tuple[bool, str]:
     
     Returns: (is_valid, reason)
     """
-    email = email.strip().lower()
-    
     # Simple but effective regex
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     
@@ -92,11 +90,6 @@ def is_disposable_domain(domain: str) -> Tuple[bool, str]:
 def is_role_based_email(email: str) -> Tuple[bool, str]:
     """
     Detect role-based emails (admin@, support@, etc).
-    
-    Why flag these?
-    - Often monitored by multiple people
-    - May not be a real person
-    - Higher bounce rates in campaigns
     """
     local_part = email.split('@')[0].lower()
     
@@ -148,7 +141,6 @@ async def verify_email(email: str) -> Dict:
     """
     Complete email verification workflow.
     """
-    email = email.strip().lower()
     
     # Step 1: Format validation
     is_valid_format, format_reason = validate_email_format(email)
